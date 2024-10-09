@@ -1,4 +1,3 @@
-#!usr/bin/env
 import rclpy
 from rclpy.node import Node
 from dc_gamepad_msgs.msg import GamePad
@@ -9,55 +8,55 @@ class GamePadNode(Node):
         Node.__init__(self, 'gamepad_node')
         self.datapub = self.create_publisher(GamePad, '/pad', 10)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.ip = '0.0.0.0'
-        self.port = 25000
+        self.ip = '192.168.51.48'
+        self.port = 23821
         self.sock.bind((self.ip, self.port))
-        self.last = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.previous_button = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         while True:
             self.listen_data()
 
     def listen_data(self):
         msg = GamePad()
 
-        msg.last_up = bool(self.last[0])
-        msg.last_left = bool(self.last[1])
-        msg.last_right = bool(self.last[2])
-        msg.last_down = bool(self.last[3])
-        msg.last_y = bool(self.last[4])
-        msg.last_x = bool(self.last[5])
-        msg.last_b = bool(self.last[6])
-        msg.last_a = bool(self.last[7])
+        msg.previous_button_up = bool(self.previous_button[0])
+        msg.previous_button_left = bool(self.previous_button[1])
+        msg.previous_button_right = bool(self.previous_button[2])
+        msg.previous_button_down = bool(self.previous_button[3])
+        msg.previous_button_y = bool(self.previous_button[4])
+        msg.previous_button_x = bool(self.previous_button[5])
+        msg.previous_button_b = bool(self.previous_button[6])
+        msg.previous_button_a = bool(self.previous_button[7])
         
-        msg.last_lt = bool(self.last[8])
-        msg.last_lb = bool(self.last[9])
-        msg.last_rt = bool(self.last[10])
-        msg.last_rb = bool(self.last[11])
-        msg.last_m1 = bool(self.last[12])
-        msg.last_m2 = bool(self.last[13])
+        msg.previous_button_lt = bool(self.previous_button[8])
+        msg.previous_button_lb = bool(self.previous_button[9])
+        msg.previous_button_rt = bool(self.previous_button[10])
+        msg.previous_button_rb = bool(self.previous_button[11])
+        msg.previous_button_m1 = bool(self.previous_button[12])
+        msg.previous_button_m2 = bool(self.previous_button[13])
 
         data = self.sock.recv(8)
-        msg.x1 = data[0]
-        msg.y1 = data[1]
-        msg.x2 = data[2]
-        msg.y2 = data[3]
-        msg.up = bool(data[4] & 1)
-        msg.left = bool(data[4] & 2)
-        msg.right = bool(data[4] & 4)
-        msg.down = bool(data[4] & 8)
-        msg.y = bool(data[4] & 16)
-        msg.x = bool(data[4] & 32)
-        msg.b = bool(data[4] & 64)
-        msg.a = bool(data[4] & 128)
+        msg.left_analog_x = data[0]
+        msg.left_analog_y = data[1]
+        msg.right_analog_x = data[2]
+        msg.right_analog_y = data[3]
+        msg.dpad_up = bool(data[4] & 1)
+        msg.dpad_left = bool(data[4] & 2)
+        msg.dpad_right = bool(data[4] & 4)
+        msg.dpad_down = bool(data[4] & 8)
+        msg.button_y = bool(data[4] & 16)
+        msg.button_x = bool(data[4] & 32)
+        msg.button_b = bool(data[4] & 64)
+        msg.button_a = bool(data[4] & 128)
 
-        msg.lt = bool(data[5] & 1)
-        msg.lb = bool(data[5] & 2)
-        msg.rt = bool(data[5] & 4)
-        msg.rb = bool(data[5] & 8)
-        msg.m1 = bool(data[5] & 16)
-        msg.m2 = bool(data[5] & 32)
+        msg.button_lt = bool(data[5] & 1)
+        msg.button_lb = bool(data[5] & 2)
+        msg.button_rt = bool(data[5] & 4)
+        msg.button_rb = bool(data[5] & 8)
+        msg.button_m1 = bool(data[5] & 16)
+        msg.button_m2 = bool(data[5] & 32)
 
         self.datapub.publish(msg)
-        self.last = [msg.up, msg.left, msg.right, msg.down, msg.y, msg.x, msg.b, msg.a, msg.lt, msg.lb, msg.rt, msg.rb, msg.m1, msg.m2]
+        self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2]
 
 def main(args=None):
     rclpy.init(args=args)
