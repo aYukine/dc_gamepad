@@ -5,13 +5,17 @@ import socket
 
 class GamePadNode(Node):
     def __init__(self):
-        Node.__init__(self, 'gamepad_node')
+        Node.__init__(self, 'gamepad_node')    
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        self.ip = s.getsockname()[0]
+        s.close()
         self.datapub = self.create_publisher(GamePad, '/pad', 10)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.ip = '192.168.51.48'
-        self.port = 23821
+        self.port = 12349
         self.sock.bind((self.ip, self.port))
-        self.previous_button = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.previous_button = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        print(f"Gamepad node started on address: {self.ip}:{self.port}")
         while True:
             self.listen_data()
 
@@ -39,6 +43,8 @@ class GamePadNode(Node):
         msg.left_analog_y = data[1]
         msg.right_analog_x = data[2]
         msg.right_analog_y = data[3]
+        msg.axis_x = data[6]
+        msg.axis_y = data[7]
         msg.dpad_up = bool(data[4] & 1)
         msg.dpad_left = bool(data[4] & 2)
         msg.dpad_right = bool(data[4] & 4)
@@ -56,7 +62,7 @@ class GamePadNode(Node):
         msg.button_m2 = bool(data[5] & 32)
 
         self.datapub.publish(msg)
-        self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2]
+        self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2, msg.axis_x, msg.axis_y]
 
 def main(args=None):
     rclpy.init(args=args)

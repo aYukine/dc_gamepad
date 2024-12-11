@@ -2,6 +2,8 @@ uint8 left_analog_x
 uint8 left_analog_y
 uint8 right_analog_x
 uint8 right_analog_y
+uint8 axis_x
+uint8 axis_y
 bool dpad_up
 bool dpad_left
 bool dpad_right
