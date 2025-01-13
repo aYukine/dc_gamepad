@@ -78,6 +78,7 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
+        gamepad_node.shutdown()
         rclpy.shutdown()
 
 
