@@ -40,32 +40,33 @@ class GamePadNode(Node):
         msg.previous_button_m2 = bool(self.previous_button[13])
         try:
             self.data = self.sock.recv(8)
+        
+            msg.left_analog_x = self.data[0]
+            msg.left_analog_y = self.data[1]
+            msg.right_analog_x = self.data[2]
+            msg.right_analog_y = self.data[3]
+            msg.axis_x = self.data[6]
+            msg.axis_y = self.data[7]
+            msg.dpad_up = bool(self.data[4] & 1)
+            msg.dpad_left = bool(self.data[4] & 2)
+            msg.dpad_right = bool(self.data[4] & 4)
+            msg.dpad_down = bool(self.data[4] & 8)
+            msg.button_y = bool(self.data[4] & 16)
+            msg.button_x = bool(self.data[4] & 32)
+            msg.button_b = bool(self.data[4] & 64)
+            msg.button_a = bool(self.data[4] & 128)
+
+            msg.button_lt = bool(self.data[5] & 1)
+            msg.button_lb = bool(self.data[5] & 2)
+            msg.button_rt = bool(self.data[5] & 4)
+            msg.button_rb = bool(self.data[5] & 8)
+            msg.button_m1 = bool(self.data[5] & 16)
+            msg.button_m2 = bool(self.data[5] & 32)
+
+            self.datapub.publish(msg)
+            self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2, msg.axis_x, msg.axis_y]
         except KeyboardInterrupt:
             pass
-        msg.left_analog_x = self.data[0]
-        msg.left_analog_y = self.data[1]
-        msg.right_analog_x = self.data[2]
-        msg.right_analog_y = self.data[3]
-        msg.axis_x = self.data[6]
-        msg.axis_y = self.data[7]
-        msg.dpad_up = bool(self.data[4] & 1)
-        msg.dpad_left = bool(self.data[4] & 2)
-        msg.dpad_right = bool(self.data[4] & 4)
-        msg.dpad_down = bool(self.data[4] & 8)
-        msg.button_y = bool(self.data[4] & 16)
-        msg.button_x = bool(self.data[4] & 32)
-        msg.button_b = bool(self.data[4] & 64)
-        msg.button_a = bool(self.data[4] & 128)
-
-        msg.button_lt = bool(self.data[5] & 1)
-        msg.button_lb = bool(self.data[5] & 2)
-        msg.button_rt = bool(self.data[5] & 4)
-        msg.button_rb = bool(self.data[5] & 8)
-        msg.button_m1 = bool(self.data[5] & 16)
-        msg.button_m2 = bool(self.data[5] & 32)
-
-        self.self.datapub.publish(msg)
-        self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2, msg.axis_x, msg.axis_y]
     
     def shutdown(self):
         self.sock.close()
