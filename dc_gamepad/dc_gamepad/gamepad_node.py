@@ -15,7 +15,7 @@ class GamePadNode(Node):
         self.port = 12349
         self.sock.bind((self.ip, self.port))
         self.previous_button = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        print(f"Gamepad node started on address: {self.ip}:{self.port}")
+        self.get_logger().info(f"Gamepad node started on address: {self.ip}:{self.port}")
         while True:
             self.listen_data()
 
@@ -63,6 +63,11 @@ class GamePadNode(Node):
 
         self.datapub.publish(msg)
         self.previous_button = [msg.dpad_up, msg.dpad_left, msg.dpad_right, msg.dpad_down, msg.button_y, msg.button_x, msg.button_b, msg.button_a, msg.button_lt, msg.button_lb, msg.button_rt, msg.button_rb, msg.button_m1, msg.button_m2, msg.axis_x, msg.axis_y]
+    
+    def shutdown(self):
+        self.sock.close()
+        self.datapub.destroy()
+        self.get_logger().info(f"Gamepad node stopped on address: {self.ip}:{self.port}, shutting down...")
 
 def main(args=None):
     rclpy.init(args=args)
