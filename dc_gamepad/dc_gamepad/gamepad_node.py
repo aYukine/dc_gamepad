@@ -37,8 +37,10 @@ class GamePadNode(Node):
         msg.previous_button_rb = bool(self.previous_button[11])
         msg.previous_button_m1 = bool(self.previous_button[12])
         msg.previous_button_m2 = bool(self.previous_button[13])
-
-        data = self.sock.recv(8)
+        try:
+            data = self.sock.recv(8)
+        except KeyboardInterrupt:
+            pass
         msg.left_analog_x = data[0]
         msg.left_analog_y = data[1]
         msg.right_analog_x = data[2]
